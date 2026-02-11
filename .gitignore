@@ -1,11 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build / output
 /tmp
 /out-tsc
+dist/
 
-/node_modules
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.vscode/*
+.idea/
+.DS_Store
+
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Misc
 /.pnp
 .pnp.js
-
-.vscode/*
+reports/
