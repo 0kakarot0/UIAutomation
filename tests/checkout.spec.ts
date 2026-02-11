@@ -21,8 +21,10 @@ test.describe('Checkout Tests', () => {
     const email = generateRandomEmail();
     const password = 'Pass123';
 
-    test.beforeEach(async ({ page }) => {
-        homePage = new HomePage(page);
+    test.beforeEach(async ({page, context}) => {
+        // 🚫 Block Google Ads (must be before navigation)
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());        homePage = new HomePage(page);
         productsPage = new ProductsPage(page);
         cartPage = new CartPage(page);
         checkoutPage = new CheckoutPage(page);

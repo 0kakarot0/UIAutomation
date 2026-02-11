@@ -1,24 +1,30 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { LoginPage } from '../pages/LoginPage';
-import { AccountCreationPage } from '../pages/AccountCreationPage';
-import { generateRandomEmail, generateRandomName } from '../utils/helpers';
-import { testUser } from '../config/envConfig';
+import {test, expect} from '@playwright/test';
+import {HomePage} from '../pages/HomePage';
+import {LoginPage} from '../pages/LoginPage';
+import {AccountCreationPage} from '../pages/AccountCreationPage';
+import {generateRandomEmail, generateRandomName} from '../utils/helpers';
+import {testUser} from '../config/envConfig';
 
 test.describe('Authentication Tests', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
     let accountCreationPage: AccountCreationPage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page, context}) => {
+        // 🚫 Block Google Ads (must be before navigation)
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());
+
         homePage = new HomePage(page);
         loginPage = new LoginPage(page);
         accountCreationPage = new AccountCreationPage(page);
         await homePage.navigateTo();
+        // await page.waitForLoadState("domcontentloaded");
+        // await page.waitForLoadState("load");
     });
 
     // Test Case 1: Register User
-    test('TC 1: Register User', async ({ page }) => {
+    test('TC 1: Register User', async ({page}) => {
         const name = generateRandomName();
         const email = generateRandomEmail();
 
@@ -41,7 +47,7 @@ test.describe('Authentication Tests', () => {
     });
 
     // Test Case 2: Login User with correct email and password
-    test('TC 2: Login User with correct email and password', async ({ page }) => {
+    test('TC 2: Login User with correct email and password', async ({page}) => {
         await expect(page).toHaveTitle(/Automation Exercise/);
         await homePage.clickSignupLogin();
         await expect(page.getByText('Login to your account')).toBeVisible();
@@ -70,14 +76,14 @@ test.describe('Authentication Tests', () => {
     });
 
     // Test Case 3: Login User with incorrect email and password
-    test('TC 3: Login User with incorrect email and password', async ({ page }) => {
+    test('TC 3: Login User with incorrect email and password', async ({page}) => {
         await homePage.clickSignupLogin();
         await loginPage.login('wrong@email.com', 'wrongpass');
         await expect(page.getByText(/incorrect/i)).toBeVisible();
     });
 
     // Test Case 4: Logout User
-    test('TC 4: Logout User', async ({ page }) => {
+    test('TC 4: Logout User', async ({page}) => {
         // Create user to login first
         const name = generateRandomName();
         const email = generateRandomEmail();
@@ -95,7 +101,7 @@ test.describe('Authentication Tests', () => {
     });
 
     // Test Case 5: Register User with existing email
-    test('TC 5: Register User with existing email', async ({ page }) => {
+    test('TC 5: Register User with existing email', async ({page}) => {
         const name = generateRandomName();
         const email = generateRandomEmail();
         const password = 'Pass123';

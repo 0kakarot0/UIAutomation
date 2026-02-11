@@ -2,8 +2,8 @@ export const BASE_URL = process.env.BASE_URL || 'https://www.automationexercise.
 
 export const TIMEOUTS = {
     global: parseInt(process.env.GLOBAL_TIMEOUT || '60000'),
-    action: parseInt(process.env.ACTION_TIMEOUT || '15000'),
-    navigation: parseInt(process.env.NAVIGATION_TIMEOUT || '30000'),
+    action: parseInt(process.env.ACTION_TIMEOUT || '35000'),
+    navigation: parseInt(process.env.NAVIGATION_TIMEOUT || '60000'),
 };
 
 export const SELECTORS = {

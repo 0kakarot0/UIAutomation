@@ -7,7 +7,6 @@ import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import { PaymentPage } from '../pages/PaymentPage';
 import { generateRandomEmail, generateRandomName } from '../utils/helpers';
-import { testUser } from '../config/envConfig'; // Using env config or just inline data if prefered
 
 test.describe('E2E Shopping Flow', () => {
     let homePage: HomePage;
@@ -23,8 +22,10 @@ test.describe('E2E Shopping Flow', () => {
     const password = 'TestPassword123!';
     const productName = 'Blue Top'; // Existing product
 
-    test.beforeEach(async ({ page }) => {
-        homePage = new HomePage(page);
+    test.beforeEach(async ({page, context}) => {
+        // 🚫 Block Google Ads (must be before navigation)
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());        homePage = new HomePage(page);
         loginPage = new LoginPage(page);
         accountCreationPage = new AccountCreationPage(page);
         productsPage = new ProductsPage(page);

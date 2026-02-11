@@ -1,5 +1,6 @@
 import { BasePage } from './BasePage';
-import { Locator, Page, expect } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
+import {th} from "@faker-js/faker";
 
 export class AccountCreationPage extends BasePage {
     readonly titleMr: Locator;
@@ -24,7 +25,7 @@ export class AccountCreationPage extends BasePage {
     constructor(page: Page) {
         super(page, '/signup');
         this.titleMr = page.getByLabel('Mr.');
-        this.passwordInput = page.locator('[data-qa="password"]');
+        this.passwordInput = page.locator('[id="password"]');
         this.daysSelect = page.locator('[data-qa="days"]');
         this.monthsID = page.locator('[id="uniform-months"]');
         this.dateOfBirthLabel = page.locator('form div:nth-child(5) label');
@@ -46,26 +47,89 @@ export class AccountCreationPage extends BasePage {
         this.continueButton = page.locator('[data-qa="continue-button"]');
     }
 
-    async fillAccountDetails(password: string, firstName: string, lastName: string, address: string, state: string, city: string, zip: string, mobile: string) {
+    async fillAccountDetails(
+        password: string,
+        firstName: string,
+        lastName: string,
+        address: string,
+        state: string,
+        city: string,
+        zip: string,
+        mobile: string
+    ) {
+        await this.selectTitleMr();
+        await this.fillPassword(password);
+        await this.selectDateOfBirth('1', 'January', '2000'); // ← pass values as params
+        await this.fillPersonalInfo(firstName, lastName);
+        await this.fillAddressAndContact(
+            address,
+            'India',
+            state,
+            city,
+            zip,
+            mobile
+        );
+    }
+
+    // ── Small focused methods ───────────────────────────────────────
+
+    private async selectTitleMr() {
         await this.utils.check(this.titleMr);
+    }
+
+    private async fillPassword(password: string) {
+        await this.utils.click(this.passwordInput);
         await this.utils.fill(this.passwordInput, password);
-        await this.utils.selectOption(this.daysSelect, '1');
+    }
 
-        this.monthsID.scrollIntoViewIfNeeded();
-        // await this.utils.click(this.monthsID);
-        await this.utils.click(this.dateOfBirthLabel);
-        await this.utils.selectOption(this.monthsSelect, 'January');
+    private async selectDay(day: string) {
+        await this.firstNameInput.scrollIntoViewIfNeeded();
 
-        // await this.utils.click(this.yearsSelect);
-        await this.utils.selectOption(this.yearsSelect, '2000');
+        await this.daysSelect.selectOption(day);
+    }
 
+    private async selectMonth(month: string) {
+        // await this.monthsID.click();
+        await this.page.waitForTimeout(150);           // tiny stabilization delay — often helps
+        await this.monthsSelect.selectOption({ label: month });  // safer than value/text mismatch
+        // or: await this.monthsSelect.selectOption('4'); // if April → value="4"
+    }
+
+    private async selectYear(year: string) {
+        // await this.yearsSelect.click();
+        await this.yearsSelect.selectOption(year);
+    }
+
+    private async selectDateOfBirth(day: string, month: string, year: string) {
+        await this.selectDay(day);
+        await this.selectMonth(month);
+        await this.selectYear(year);
+    }
+
+    private async fillPersonalInfo(firstName: string, lastName: string) {
         await this.utils.fill(this.firstNameInput, firstName);
         await this.utils.fill(this.lastNameInput, lastName);
+    }
+
+    private async fillAddressAndContact(
+        address: string,
+        country: string,
+        state: string,
+        city: string,
+        zip: string,
+        mobile: string
+    ) {
+        await this.addressInput.scrollIntoViewIfNeeded();
         await this.utils.fill(this.addressInput, address);
-        await this.utils.selectOption(this.countrySelect, 'India');
+
+        await this.countrySelect.scrollIntoViewIfNeeded();
+        await this.utils.selectOption(this.countrySelect, country);
+
         await this.utils.fill(this.stateInput, state);
+
         await this.utils.fill(this.cityInput, city);
         await this.utils.fill(this.zipInput, zip);
+        await this.mobileInput.scrollIntoViewIfNeeded();
         await this.utils.fill(this.mobileInput, mobile);
     }
 
@@ -74,10 +138,11 @@ export class AccountCreationPage extends BasePage {
     }
 
     async verifyAccountCreated() {
-        await this.utils.expectVisible(this.accountCreatedMessage);
+        await this.closeAdIfPresent();
+        await this.utils.expectVisible(this.accountCreatedMessage, 60000);
     }
 
     async clickContinue() {
-        await this.utils.click(this.continueButton);
+        await this.utils.click(this.continueButton,{},"domcontentloaded" );
     }
 }

@@ -8,8 +8,10 @@ test.describe('Cart Tests', () => {
     let productsPage: ProductsPage;
     let cartPage: CartPage;
 
-    test.beforeEach(async ({ page }) => {
-        homePage = new HomePage(page);
+    test.beforeEach(async ({page, context}) => {
+        // 🚫 Block Google Ads (must be before navigation)
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());        homePage = new HomePage(page);
         productsPage = new ProductsPage(page);
         cartPage = new CartPage(page);
         await homePage.navigateTo();

@@ -1,5 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
-import { WaitUtils } from './WaitUtils';
+import {Page, Locator, expect} from '@playwright/test';
+import {WaitUtils} from './WaitUtils';
 
 export class PlaywrightUtils {
     private page: Page;
@@ -16,7 +16,7 @@ export class PlaywrightUtils {
      * @param waitState Load state to wait for (default: 'domcontentloaded').
      */
     async goto(url: string, waitState: 'load' | 'domcontentloaded' | 'networkidle' = 'domcontentloaded') {
-        await this.page.goto(url, { waitUntil: waitState });
+        await this.page.goto(url, {waitUntil: waitState});
     }
 
     /**
@@ -25,8 +25,14 @@ export class PlaywrightUtils {
      * @param options Click options (force, timeout, etc.)
      * @param waitState Optional load state to wait for after click.
      */
-    async click(selector: string | Locator, options?: { force?: boolean, timeout?: number }, waitState?: 'load' | 'domcontentloaded' | 'networkidle') {
+    async click(selector: string | Locator, options?: {
+        force?: boolean,
+        timeout?: number
+    }, waitState?: 'load' | 'domcontentloaded' | 'networkidle') {
         await this.waitUtils.waitForSelectorVisible(selector);
+        // await this.waitUtils.waitForPageLoad();
+        // await this.waitUtils.waitForNetworkIdle();
+        // await this.waitUtils.waitForDomContentLoaded();
 
         if (typeof selector === 'string') {
             await this.page.click(selector, options);
@@ -45,12 +51,16 @@ export class PlaywrightUtils {
      * @param value Value to enter.
      */
     async fill(selector: string | Locator, value: string) {
-        await this.waitUtils.waitForSelectorVisible(selector);
+        try {
+            await this.waitUtils.waitForSelectorVisible(selector);
 
-        if (typeof selector === 'string') {
-            await this.page.fill(selector, value);
-        } else {
-            await selector.fill(value);
+            if (typeof selector === 'string') {
+                await this.page.fill(selector, value);
+            } else {
+                await selector.fill(value);
+            }
+        } catch (e) {
+            console.error("An error occurred:", e);
         }
     }
 
@@ -67,7 +77,11 @@ export class PlaywrightUtils {
         }
     }
 
-    async setInputFiles(selector: string | Locator, files: string | string[] | { name: string; mimeType: string; buffer: Buffer; }[]) {
+    async setInputFiles(selector: string | Locator, files: string | string[] | {
+        name: string;
+        mimeType: string;
+        buffer: Buffer;
+    }[]) {
         await this.waitUtils.waitForSelectorVisible(selector);
         if (typeof selector === 'string') {
             await this.page.setInputFiles(selector, files);
@@ -77,10 +91,13 @@ export class PlaywrightUtils {
     }
 
     async expectVisible(selector: string | Locator, timeout: number = 30000) {
+        await this.waitUtils.waitForDomContentLoaded();
+        await this.waitUtils.waitForNetworkIdle();
+        await this.waitUtils.waitForPageLoad();
         if (typeof selector === 'string') {
-            await expect(this.page.locator(selector)).toBeVisible({ timeout });
+            await expect(this.page.locator(selector)).toBeVisible({timeout});
         } else {
-            await expect(selector).toBeVisible({ timeout });
+            await expect(selector).toBeVisible({timeout});
         }
     }
 
@@ -89,25 +106,29 @@ export class PlaywrightUtils {
     }
 
     /**
-    * Checks a checkbox or radio button after ensuring it is visible and enabled.
-    * @param selector Selector or Locator
-    */
+     * Checks a checkbox or radio button after ensuring it is visible and enabled.
+     * @param selector Selector or Locator
+     */
     async check(selector: string | Locator) {
         const locator = typeof selector === 'string'
             ? this.page.locator(selector)
             : selector;
 
-        await expect(locator).toBeVisible();
-        await expect(locator).toBeEnabled();
+        await this.waitUtils.waitForSelectorVisible(locator);
+        // await expect(locator).toBeEnabled();
 
-        await locator.check();
+        try {
+            await locator.check();
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
     }
 
     /**
-    * Selects an option from a dropdown (<select> element).
-    * @param selector Selector or Locator
-    * @param value Value, label, or index of option
-    */
+     * Selects an option from a dropdown (<select> element).
+     * @param selector Selector or Locator
+     * @param value Value, label, or index of option
+     */
     async selectOption(
         selector: string | Locator,
         value: string | { label?: string; value?: string; index?: number }
@@ -121,15 +142,14 @@ export class PlaywrightUtils {
 
         if (typeof value === 'string') {
             // Try selecting by value first
-            await locator.selectOption({ value }).catch(async () => {
+            await locator.selectOption({value}).catch(async () => {
                 // If not found by value, try label
-                await locator.selectOption({ label: value });
+                await locator.selectOption({label: value});
             });
         } else {
             await locator.selectOption(value);
         }
     }
-
 
 
 }

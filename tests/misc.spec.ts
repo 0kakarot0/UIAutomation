@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { ContactUsPage } from '../pages/ContactUsPage';
-import { TestCasesPage } from '../pages/TestCasesPage';
-import { CartPage } from '../pages/CartPage';
+import {test, expect} from '@playwright/test';
+import {HomePage} from '../pages/HomePage';
+import {ContactUsPage} from '../pages/ContactUsPage';
+import {TestCasesPage} from '../pages/TestCasesPage';
+import {CartPage} from '../pages/CartPage';
 
 test.describe('Miscellaneous Tests', () => {
     let homePage: HomePage;
@@ -10,7 +10,9 @@ test.describe('Miscellaneous Tests', () => {
     let testCasesPage: TestCasesPage;
     let cartPage: CartPage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page, context}) => {
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());
         homePage = new HomePage(page);
         contactUsPage = new ContactUsPage(page);
         testCasesPage = new TestCasesPage(page);
@@ -19,7 +21,7 @@ test.describe('Miscellaneous Tests', () => {
     });
 
     // Test Case 6: Contact Us Form
-    test('TC 6: Contact Us Form', async ({ page }) => {
+    test('TC 6: Contact Us Form', async ({page}) => {
         await homePage.clickContactUs();
         await expect(page.getByText('Get In Touch')).toBeVisible();
         // File upload requires a file. Creating a dummy file.
@@ -40,7 +42,7 @@ test.describe('Miscellaneous Tests', () => {
     });
 
     // Test Case 10: Verify Subscription in home page
-    test('TC 10: Verify Subscription in home page', async ({ page }) => {
+    test('TC 10: Verify Subscription in home page', async ({page}) => {
         await homePage.scrollToBottom();
         await expect(page.getByText('Subscription')).toBeVisible();
         await homePage.subscribe('test@example.com');
@@ -48,7 +50,7 @@ test.describe('Miscellaneous Tests', () => {
     });
 
     // Test Case 11: Verify Subscription in Cart page
-    test('TC 11: Verify Subscription in Cart page', async ({ page }) => {
+    test('TC 11: Verify Subscription in Cart page', async ({page}) => {
         await homePage.clickCart();
         await expect(page.getByText('Subscription')).toBeVisible();
         await cartPage.subscribe('test@example.com');
@@ -56,7 +58,7 @@ test.describe('Miscellaneous Tests', () => {
     });
 
     // Test Case 25: Verify Scroll Up using 'Arrow' button and Scroll Down functionality
-    test('TC 25: Verify Scroll Up using Arrow button', async ({ page }) => {
+    test('TC 25: Verify Scroll Up using Arrow button', async ({page}) => {
         await expect(page.locator('#slider-carousel')).toBeVisible(); // Verify Top
         await homePage.scrollToBottom();
         await expect(page.getByText('Subscription')).toBeVisible(); // Verify Bottom

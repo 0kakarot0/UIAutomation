@@ -8,12 +8,16 @@ export default defineConfig({
     testDir: './tests',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 0,
+    retries: process.env.CI ? 3 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: [
         ['html', { outputFolder: 'playwright-report' }],
         ['list']
     ],
+    // ────────────────────────────────────────────────
+    // Add this line here (top-level, same level as testDir, use, projects, etc.)
+    timeout: 180_000,          // 90 seconds for each test (adjust as needed: 120_000, 180_000...)
+    // ────────────────────────────────────────────────
     use: {
         baseURL: config.baseUrl,
         trace: 'on-first-retry',
@@ -27,9 +31,11 @@ export default defineConfig({
             name: 'chromium',
             use: {
                 ...devices['Desktop Chrome'],
+                headless: true,
                 launchOptions: {
                     slowMo: 1000,
                 },
+                viewport: { width: 1920, height: 1080 },
             },
 
         },

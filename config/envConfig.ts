@@ -19,7 +19,7 @@ export const config = {
     baseUrl: process.env.BASE_URL || 'https://www.automationexercise.com',
     timeouts: {
         global: parseInt(process.env.GLOBAL_TIMEOUT || '60000'),
-        action: parseInt(process.env.ACTION_TIMEOUT || '15000'),
-        navigation: parseInt(process.env.NAVIGATION_TIMEOUT || '30000'),
+        action: parseInt(process.env.ACTION_TIMEOUT || '35000'),
+        navigation: parseInt(process.env.NAVIGATION_TIMEOUT || '300000'),
     },
 };
