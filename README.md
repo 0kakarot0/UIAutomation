@@ -10,7 +10,7 @@ A production-ready UI automation framework using **Playwright** with **TypeScrip
 - **Page Object Model (POM)** — Clear separation of page structure and test logic
 - **Multiple test suites** — Authentication, Products, Cart, Checkout, E2E flow, and miscellaneous
 - **Dynamic test data** — Random user data per run for test isolation
-- **HTML + list reporters** — Built-in reporting
+- **Reporting** — Playwright HTML + **Allure** results (with attachments)
 - **CI-ready** — Retries and headless configuration for CI (e.g. GitHub Actions)
 
 ---
@@ -108,6 +108,29 @@ npx playwright test -g "Register User"
 ```bash
 npx playwright show-report
 ```
+
+### Allure report (summary)
+
+- **Generate & open Allure report in one step:**
+
+  ```bash
+  npm run test:allure
+  ```
+
+- **Or manually:**
+
+  ```bash
+  # 1. Run tests (produces allure-results/)
+  npm test
+
+  # 2. Generate static Allure report into allure-report/
+  npm run report:gen
+
+  # 3. Open the generated report in a browser
+  npm run report:open
+  ```
+
+For more details on how reporting is wired (reporters, folders, CI tips), see `docs/REPORTING.md`.
 
 ---
 
