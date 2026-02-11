@@ -30,11 +30,16 @@ export class WaitUtils {
 
     /**
      * Waits for a selector to be visible.
+     *
+     * Note: We intentionally do NOT wait for an explicit page load state here.
+     * Playwright's built-in auto-waiting on locators is usually enough and
+     * additional global waits (load/networkidle) have been a common source
+     * of unnecessary timeouts on dynamic pages.
+     *
      * @param selector The selector to wait for.
      * @param timeout Optional timeout in milliseconds.
      */
     async waitForSelectorVisible(selector: string | Locator, timeout: number = 10000) {
-        await this.waitForPageLoad()
         if (typeof selector === 'string') {
             await this.page.waitForSelector(selector, { state: 'visible', timeout });
         } else {

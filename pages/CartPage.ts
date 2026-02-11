@@ -39,7 +39,11 @@ export class CartPage extends BasePage {
     }
 
     async proceedToCheckout() {
-        await this.utils.click(this.proceedToCheckoutButton);
+        // The \"Proceed To Checkout\" button can sometimes be below the fold.
+        // Scroll it into view and give it a slightly longer timeout to
+        // reduce cross-browser flakiness.
+        await this.proceedToCheckoutButton.scrollIntoViewIfNeeded();
+        await this.utils.click(this.proceedToCheckoutButton, { timeout: 20000 });
     }
 
     async subscribe(email: string) {
