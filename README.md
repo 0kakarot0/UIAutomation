@@ -199,9 +199,7 @@ Tests are aligned with [Automation Exercise](https://www.automationexercise.com/
 ├── utils/                  # Helpers & utilities
 │   ├── helpers.ts          # Random data (email, name)
 │   ├── PlaywrightUtils.ts
-│   ├── WaitUtils.ts
-│   ├── apiHelper.ts
-│   └── assertions.ts
+│   └── WaitUtils.ts
 ├── playwright.config.ts    # Playwright config (reporters, timeouts, projects)
 ├── package.json
 ├── tsconfig.json

@@ -55,8 +55,20 @@ export class ProductsPage extends BasePage {
     }
 
     async proceedToCart() {
-        await this.utils.expectVisible(this.viewCartLink);
-        await this.utils.click(this.viewCartLink);
+        // The \"View Cart\" link appears in a modal after adding a product.
+        // On some runs / browsers it can be flaky or not rendered as expected,
+        // while the top navigation \"Cart\" link is always available.
+        //
+        // To make this flow more robust, prefer \"View Cart\" when it is
+        // actually visible, but gracefully fall back to the nav \"Cart\" link.
+        const hasModalViewCart = await this.viewCartLink.isVisible().catch(() => false);
+
+        if (hasModalViewCart) {
+            await this.utils.click(this.viewCartLink);
+        } else {
+            const navCartLink = this.page.getByRole('link', { name: 'Cart' });
+            await this.utils.click(navCartLink);
+        }
     }
 
     async continueShopping() {

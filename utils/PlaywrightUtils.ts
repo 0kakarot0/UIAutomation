@@ -29,7 +29,10 @@ export class PlaywrightUtils {
         force?: boolean,
         timeout?: number
     }, waitState?: 'load' | 'domcontentloaded' | 'networkidle') {
-        await this.waitUtils.waitForSelectorVisible(selector);
+        // Use the same timeout for the visibility wait as for the click,
+        // falling back to a sensible default.
+        const waitTimeout = options?.timeout ?? 10000;
+        await this.waitUtils.waitForSelectorVisible(selector, waitTimeout);
         // await this.waitUtils.waitForPageLoad();
         // await this.waitUtils.waitForNetworkIdle();
         // await this.waitUtils.waitForDomContentLoaded();
@@ -91,17 +94,18 @@ export class PlaywrightUtils {
     }
 
     async expectVisible(selector: string | Locator, timeout: number = 30000) {
-        await this.waitUtils.waitForDomContentLoaded();
-        await this.waitUtils.waitForNetworkIdle();
-        await this.waitUtils.waitForPageLoad();
-        if (typeof selector === 'string') {
-            await expect(this.page.locator(selector)).toBeVisible({timeout});
-        } else {
-            await expect(selector).toBeVisible({timeout});
-        }
+        const locator = typeof selector === 'string'
+            ? this.page.locator(selector)
+            : selector;
+
+        await expect(locator).toBeVisible({ timeout });
     }
 
     async hover(locator: Locator) {
+        // Ensure the element is in view and visible before hovering to
+        // reduce flakiness across browsers (especially WebKit).
+        await locator.scrollIntoViewIfNeeded();
+        await locator.waitFor({ state: 'visible', timeout: 15000 });
         await locator.hover();
     }
 
