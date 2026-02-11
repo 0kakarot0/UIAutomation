@@ -1,93 +1,227 @@
 # UI Automation Framework - Automation Exercise
 
-This project is a clean, production-ready UI automation framework using **Playwright** with **TypeScript**, designed to test the [Automation Exercise](https://www.automationexercise.com/) website. It follows the **Page Object Model (POM)** design pattern for maintainability and scalability.
+A production-ready UI automation framework using **Playwright** with **TypeScript**, following the **Page Object Model (POM)** design pattern. It tests the [Automation Exercise](https://www.automationexercise.com/) e-commerce site.
 
-## 🚀 Features
+---
 
-- **Playwright & TypeScript**: Fast, reliable, and strongly typed.
-- **Page Object Model (POM)**: separation of page elements and test logic.
-- **E2E Flow**: Covers User Registration, Product Search, Add to Cart, Checkout, and Payment.
-- **Dynamic Data**: Generates random user data for every run to ensure isolation.
-- **Reporting**: HTML and List reporters configured.
-- **CI/CD Ready**: specific configuration for CI environments (retries, headless).
+## Features
 
-## 🛠️ Prerequisites
+- **Playwright & TypeScript** — Fast, reliable, strongly typed tests
+- **Page Object Model (POM)** — Clear separation of page structure and test logic
+- **Multiple test suites** — Authentication, Products, Cart, Checkout, E2E flow, and miscellaneous
+- **Dynamic test data** — Random user data per run for test isolation
+- **HTML + list reporters** — Built-in reporting
+- **CI-ready** — Retries and headless configuration for CI (e.g. GitHub Actions)
 
-- **Node.js**: v14 or higher (Recommended: LTS)
-- **npm** (comes with Node.js)
+---
 
-## 📦 Installation
+## Prerequisites
 
-1. **Clone the repository:**
+- **Node.js** — v14 or higher (LTS recommended)
+- **npm** — Included with Node.js
+
+---
+
+## Installation
+
+1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd <project-folder>
+   git clone https://github.com/0kakarot0/UIAutomation.git
+   cd UIAutomation
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Install Playwright Browsers:**
+3. **Install Playwright browsers** (first-time setup)
    ```bash
    npx playwright install
    ```
 
-## 🏃 Running Tests
+---
 
-### Run all tests
+## How to Run Tests
+
+### Run all tests (default: headless, Chromium)
+```bash
+npm test
+```
+or
 ```bash
 npx playwright test
 ```
 
-### Run a specific test file
+### Run with visible browser (headed)
 ```bash
-npx playwright test tests/e2e.spec.ts
+npm run test:headed
 ```
-
-### Run in UI Mode (Interactive)
-```bash
-npx playwright test --ui
-```
-
-### Run in Headed Mode (Visible Browser)
+or
 ```bash
 npx playwright test --headed
 ```
 
-### View Report
+### Run in UI mode (interactive)
+```bash
+npm run test:ui
+```
+or
+```bash
+npx playwright test --ui
+```
+
+### Debug mode (step-through, inspector)
+```bash
+npm run test:debug
+```
+or
+```bash
+npx playwright test --debug
+```
+
+### Re-run only failed tests
+```bash
+npm run test:failed
+```
+or
+```bash
+npx playwright test --last-failed
+```
+
+### Run a specific test file
+```bash
+npx playwright test tests/auth.spec.ts
+npx playwright test tests/cart.spec.ts
+npx playwright test tests/checkout.spec.ts
+npx playwright test tests/e2e.spec.ts
+npx playwright test tests/misc.spec.ts
+npx playwright test tests/products.spec.ts
+```
+
+### Run a specific test by name
+```bash
+npx playwright test -g "Register User"
+```
+
+### View the last HTML report
 ```bash
 npx playwright show-report
 ```
 
-## 📂 Project Structure
+---
 
-```
-├── config/             # Environment configuration (URLs, Timeouts)
-├── pages/              # Page Object Classes (Locators & Methods)
-├── tests/              # Test Specifications (e2e.spec.ts)
-├── utils/              # Helper functions (Random data generators)
-├── playwright.config.ts # Main Playwright configuration
-├── package.json        # Dependencies and Scripts
-└── README.md           # Documentation
-```
+## Test Types Included in This Project
 
-## ⚙️ Configuration
+Tests are aligned with [Automation Exercise](https://www.automationexercise.com/) test cases and grouped by feature.
 
-- **Base URL**: Configured in `config/envConfig.ts` (Default: `https://www.automationexercise.com`).
-- **Timeouts**: Global and action timeouts are centrally managed in `config/envConfig.ts`.
-- **Environment Variables**: Supports `.env` file for secrets (if extended).
+| Suite | File | Description |
+|-------|------|-------------|
+| **Authentication** | `tests/auth.spec.ts` | Signup, login, logout, duplicate email |
+| **Products** | `tests/products.spec.ts` | Product list, search, categories, brands, reviews |
+| **Cart** | `tests/cart.spec.ts` | Add to cart, quantity, remove items |
+| **Checkout** | `tests/checkout.spec.ts` | Place order flows, address, invoice download |
+| **E2E** | `tests/e2e.spec.ts` | Full flow: search → register → cart → checkout → payment |
+| **Miscellaneous** | `tests/misc.spec.ts` | Contact form, test cases page, subscription, scroll |
 
-## 📝 Test Flow w/ Verification
+### Authentication (`auth.spec.ts`)
 
-The main E2E test (`tests/e2e.spec.ts`) performs the following:
-1. **Product Search**: Searches for "Blue Top".
-2. **Registration**: Registers a unique user (Randomized).
-3. **Cart**: Adds product to cart and verifies contents.
-4. **Checkout**: Proceeds to checkout, verifies address.
-5. **Payment**: Simulates entering card details and confirming order.
-6. **Cleanup**: Deletes the created account.
+- **TC 1** — Register User: signup, complete account, verify, delete account  
+- **TC 2** — Login with correct email and password  
+- **TC 3** — Login with incorrect email/password (error message)  
+- **TC 4** — Logout User  
+- **TC 5** — Register with existing email (validation)
+
+### Products (`products.spec.ts`)
+
+- **TC 8** — Verify All Products and product detail page  
+- **TC 9** — Search Product  
+- **TC 18** — View category products (e.g. Women/Dress, Men/Tshirts)  
+- **TC 19** — View and filter by brand (Polo, H&M)  
+- **TC 20** — Search products and verify cart (with login)  
+- **TC 21** — Add review on product  
+- **TC 22** — Add to cart from Recommended items  
+
+### Cart (`cart.spec.ts`)
+
+- **TC 12** — Add multiple products in cart  
+- **TC 13** — Verify product quantity in cart  
+- **TC 17** — Remove products from cart  
+
+### Checkout (`checkout.spec.ts`)
+
+- **TC 14** — Place order: register during checkout  
+- **TC 15** — Place order: register before checkout  
+- **TC 16** — Place order: login before checkout  
+- **TC 23** — Verify address details on checkout page  
+- **TC 24** — Download invoice after purchase  
+
+### E2E (`e2e.spec.ts`)
+
+- Full shopping flow: product search → user registration → add to cart → checkout → payment → account cleanup  
+
+### Miscellaneous (`misc.spec.ts`)
+
+- **TC 6** — Contact Us form  
+- **TC 7** — Verify Test Cases page  
+- **TC 10** — Subscription on home page  
+- **TC 11** — Subscription on cart page  
+- **TC 25** — Scroll up/down (arrow button)  
 
 ---
+
+## Project Structure
+
+```
+├── config/                 # Environment & app config
+│   ├── constants.ts        # Base URL, timeouts (env overrides)
+│   └── envConfig.ts        # Test user defaults, env config
+├── pages/                  # Page Object classes
+│   ├── BasePage.ts
+│   ├── HomePage.ts
+│   ├── LoginPage.ts
+│   ├── AccountCreationPage.ts
+│   ├── ProductsPage.ts
+│   ├── CartPage.ts
+│   ├── CheckoutPage.ts
+│   ├── PaymentPage.ts
+│   ├── ContactUsPage.ts
+│   └── TestCasesPage.ts
+├── tests/                  # Test specs
+│   ├── auth.spec.ts
+│   ├── cart.spec.ts
+│   ├── checkout.spec.ts
+│   ├── e2e.spec.ts
+│   ├── misc.spec.ts
+│   └── products.spec.ts
+├── types/                  # Shared TypeScript types
+│   └── index.ts
+├── utils/                  # Helpers & utilities
+│   ├── helpers.ts          # Random data (email, name)
+│   ├── PlaywrightUtils.ts
+│   ├── WaitUtils.ts
+│   ├── apiHelper.ts
+│   └── assertions.ts
+├── playwright.config.ts    # Playwright config (reporters, timeouts, projects)
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+---
+
+## Configuration
+
+- **Base URL** — `config/envConfig.ts` (default: `https://www.automationexercise.com`)  
+- **Timeouts** — Global and action timeouts in `config/constants.ts` / `config/envConfig.ts`  
+- **Environment** — Optional `.env` for `BASE_URL`, `TEST_EMAIL`, `TEST_PASSWORD`, `GLOBAL_TIMEOUT`, etc. (do not commit `.env`; use `.env.example` as a template if needed.)
+
+---
+
+## Ignored by Git
+
+The repo ignores: `node_modules/`, `test-results/`, `playwright-report/`, `blob-report/`, `.env`, `.DS_Store`, and common IDE/OS files so that builds and reports stay local and secrets are not committed.
+
+---
+
 **Author**: Antigravity SDET
