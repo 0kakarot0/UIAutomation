@@ -245,4 +245,4 @@ The repo ignores: `node_modules/`, `test-results/`, `playwright-report/`, `blob-
 
 ---
 
-**Author**: Antigravity SDET
+**Author**: Ahtisham
