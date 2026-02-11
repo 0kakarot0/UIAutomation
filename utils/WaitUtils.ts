@@ -34,6 +34,7 @@ export class WaitUtils {
      * @param timeout Optional timeout in milliseconds.
      */
     async waitForSelectorVisible(selector: string | Locator, timeout: number = 10000) {
+        await this.waitForPageLoad()
         if (typeof selector === 'string') {
             await this.page.waitForSelector(selector, { state: 'visible', timeout });
         } else {

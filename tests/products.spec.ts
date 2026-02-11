@@ -1,15 +1,17 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { ProductsPage } from '../pages/ProductsPage';
-import { LoginPage } from '../pages/LoginPage';
-import { generateRandomEmail, generateRandomName } from '../utils/helpers';
+import {test, expect} from '@playwright/test';
+import {HomePage} from '../pages/HomePage';
+import {ProductsPage} from '../pages/ProductsPage';
+import {LoginPage} from '../pages/LoginPage';
+import {generateRandomEmail, generateRandomName} from '../utils/helpers';
 
 test.describe('Product Tests', () => {
     let homePage: HomePage;
     let productsPage: ProductsPage;
     let loginPage: LoginPage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page, context}) => {
+        await context.route('**/*googlesyndication.com/**', route => route.abort());
+        await context.route('**/*doubleclick.net/**', route => route.abort());
         homePage = new HomePage(page);
         productsPage = new ProductsPage(page);
         loginPage = new LoginPage(page);
@@ -17,7 +19,7 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 8: Verify All Products and product detail page
-    test('TC 8: Verify All Products and product detail page', async ({ page }) => {
+    test('TC 8: Verify All Products and product detail page', async ({page}) => {
         await homePage.clickProducts();
         await expect(page).toHaveURL(/.*products/);
         await expect(page.getByText('All Products')).toBeVisible();
@@ -35,14 +37,14 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 9: Search Product
-    test('TC 9: Search Product', async ({ page }) => {
+    test('TC 9: Search Product', async ({page}) => {
         await homePage.clickProducts();
         await productsPage.searchProduct('Dress');
         await expect(page.getByText('Searched Products')).toBeVisible();
     });
 
     // Test Case 18: View Category Products
-    test('TC 18: View Category Products', async ({ page }) => {
+    test('TC 18: View Category Products', async ({page}) => {
         // Need to ensure category sidebar visible
         // This might fail if ads or overlays interfere, but logic is sound.
         await expect(page.locator('#accordian')).toBeVisible();
@@ -55,7 +57,7 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 19: View & Cart Brand Products
-    test('TC 19: View & Cart Brand Products', async ({ page }) => {
+    test('TC 19: View & Cart Brand Products', async ({page}) => {
         await homePage.clickProducts();
         await productsPage.filterByBrand('Polo');
         await expect(page.getByText('Brand - Polo Products')).toBeVisible();
@@ -65,7 +67,7 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 20: Search Products and Verify Cart After Login
-    test('TC 20: Search Products and Verify Cart After Login', async ({ page }) => {
+    test('TC 20: Search Products and Verify Cart After Login', async ({page}) => {
         await homePage.clickProducts();
         await productsPage.searchProduct('Blue Top');
         await expect(page.getByText('Searched Products')).toBeVisible();
@@ -89,7 +91,7 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 21: Add review on product
-    test('TC 21: Add review on product', async ({ page }) => {
+    test('TC 21: Add review on product', async ({page}) => {
         await homePage.clickProducts();
         await productsPage.viewProductDetails('Blue Top');
 
@@ -98,7 +100,7 @@ test.describe('Product Tests', () => {
     });
 
     // Test Case 22: Add to cart from Recommended items
-    test('TC 22: Add to cart from Recommended items', async ({ page }) => {
+    test('TC 22: Add to cart from Recommended items', async ({page}) => {
         await homePage.scrollToBottom();
         await expect(page.getByText('recommended items')).toBeVisible();
 
